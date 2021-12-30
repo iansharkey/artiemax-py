@@ -98,52 +98,52 @@ class Artiemax:
     self.__send('followNotify', ('false','true')[enabled])
 
   def ping(self):
-    return self.__send('ping')
+    return self.__send('ping') and self
 
   def arc(self, distance, wangle):
     import pdb; pdb.set_trace()
-    return self.__send('arc', [distance, wangle])
+    return self.__send('arc', [distance, wangle]) and self
   
   
   def uptime(self):
     return self.__send('uptime')
 
   def forward(self, distance):
-    return self.__send('forward', distance)
+    return self.__send('forward', distance) and self
 
   def back(self, distance):
-    return self.__send('back',    distance)
+    return self.__send('back',    distance) and self
 
   def left(self, degrees):
-    return self.__send('left',    degrees)
+    return self.__send('left',    degrees) and self
 
   def right(self, degrees):
-    return self.__send('right',   degrees)
+    return self.__send('right',   degrees) and self
 
   def penup(self):
-    return self.__send('penup')
+    return self.__send('penup') and self
 
   def pendown(self, pen_num):
-    return self.__send('pendown', pen_num)
+    return self.__send('pendown', pen_num) and self
 
   def beep(self, sound_num):
-    return self.__send('beep', sound_num)
+    return self.__send('beep', sound_num) and self
 
   def setLed(self, led_num, rgb):
-    return self.__send('leds', [led_num, rgb])
+    return self.__send('leds', [led_num, rgb]) and self
 
   def setAllLeds(self, rgb):
     return self.setLed(6, rgb)
 
   def colorState(self):
-    return self.__send('colorState')
+    return self.__send('colorState') 
   
   def findColour(self, rgb):
     return self.__send('findColour', rgb)
   
   def follow(self, enabled):
     enabled = bool(enabled)
-    return self.__send('follow', enabled)    
+    return self.__send('follow', enabled) and self
   
   def collideState(self):
     return self.__send('collideState')
