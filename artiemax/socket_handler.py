@@ -20,7 +20,7 @@ class SocketHandler(threading.Thread):
     def on_error(ws, error):
       print(error)
 
-    def on_close(ws):
+    def on_close(ws, close_status_code, close_msg):
       # TODO: implement reconnection strategy
       pass
 
