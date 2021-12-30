@@ -108,9 +108,7 @@ class Artiemax:
     return self.__send('ping') or self
 
   def arc(self, distance, wangle):
-    import pdb; pdb.set_trace()
     return self.__send('arc', [distance, wangle]) or self
-  
   
   def uptime(self):
     return self.__send('uptime')
