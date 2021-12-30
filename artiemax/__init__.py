@@ -27,8 +27,9 @@ class Artiemax:
     self.__on_collide  = None
     self.__on_follow   = None
 
-    if address:
-      self.connect(address)
+    if address is None:
+      address = '192.168.4.1'
+    self.connect(address)
 
   def connect(self, address):
     # Set up the socket handling
