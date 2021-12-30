@@ -2,7 +2,7 @@ try:
   from queue import Queue
 except ImportError:
   from Queue import Queue
-from mirobot.socket_handler import SocketHandler
+from artiemax.socket_handler import SocketHandler
 import time
 import string
 import random
@@ -15,7 +15,7 @@ except ImportError:
 
 _sentinel = object()
 
-class Mirobot:
+class Artiemax:
   def __init__(self, address = None, debug = False):
     # Initialisation for the id field
     self.nonce  = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(4))
@@ -100,44 +100,68 @@ class Mirobot:
   def ping(self):
     return self.__send('ping')
 
+  def arc(self, distance, wangle):
+    import pdb; pdb.set_trace()
+    return self.__send('arc', [distance, wangle])
+  
+  
   def uptime(self):
     return self.__send('uptime')
 
   def forward(self, distance):
-    return self.__send('forward', distance, distance/20)
+    return self.__send('forward', distance)
 
   def back(self, distance):
-    return self.__send('back',    distance, distance/20)
+    return self.__send('back',    distance)
 
   def left(self, degrees):
-    return self.__send('left',    degrees,  degrees/20)
+    return self.__send('left',    degrees)
 
   def right(self, degrees):
-    return self.__send('right',   degrees,  degrees/20)
+    return self.__send('right',   degrees)
 
   def penup(self):
     return self.__send('penup')
 
-  def pendown(self):
-    return self.__send('pendown')
+  def pendown(self, pen_num):
+    return self.__send('pendown', pen_num)
 
-  def beep(self, milliseconds = 500):
-    return self.__send('beep',    milliseconds, milliseconds / 500)
+  def beep(self, sound_num):
+    return self.__send('beep', sound_num)
 
+  def setLed(self, led_num, rgb):
+    return self.__send('leds', [led_num, rgb])
+
+  def setAllLeds(self, rgb):
+    return self.setLed(6, rgb)
+
+  def colorState(self):
+    return self.__send('colorState')
+  
+  def findColour(self, rgb):
+    return self.__send('findColour', rgb)
+  
+  def follow(self, enabled):
+    enabled = bool(enabled)
+    return self.__send('follow', enabled)    
+  
   def collideState(self):
     return self.__send('collideState')
 
   def followState(self):
     return self.__send('followState')
 
+  def getVoltage(self):
+    return self.__send('getVoltage')
+  
   def disconnect(self):
     self.__send_q.put(_sentinel)
 
-  def __send(self, cmd, arg = None, timeout = 1):
+  def __send(self, cmd, arg = None, timeout = 500000000):
     # Assemble the message
     msg = {'cmd': cmd}
     if (arg is not None):
-      msg['arg'] = str(arg)
+      msg['arg'] = arg
 
     # Send the message and handle exceptions
     try:
@@ -155,6 +179,7 @@ class Mirobot:
     while True:
       try:
         timeout = max(1, deadline - time.time())
+        #import pdb; pdb.set_trace()
         incoming = self.recv_q.get(block = True, timeout = timeout)
       except KeyboardInterrupt as e:
         self.disconnect()
