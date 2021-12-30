@@ -15,10 +15,10 @@ class SocketHandler(threading.Thread):
 
     def on_message(ws, message):
       self.recv_q.put(json.loads(message))
-      print(message)
+      logging.debug(message)
 
     def on_error(ws, error):
-      print(error)
+      logging.error(error)
 
     def on_close(ws, close_status_code, close_msg):
       # TODO: implement reconnection strategy

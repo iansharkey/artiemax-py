@@ -16,11 +16,33 @@ except ImportError:
 _sentinel = object()
 
 class Artiemax:
+  """
+  Artie Max interface object.
+
+  This class is based on the mirobot-py code, with some updates for Artie Max functions
+  and changes to support chained methods.
+
+  An example usage:
+  >>> import artiemax
+  >>> with artiemax.Artiemax() as artie:
+  >>>   artie.inches().forward(4).left(45).beep(3)
+  >>>
+
+  Parameters
+  ----------
+
+  address: string
+     Network address of the Artie Max robot; defaults to '192.168.4.1'
+  debug: boolean
+     Flag for outputting debug logs to standard output
+
+  """
   def __init__(self, address = None, debug = False):
     # Initialisation for the id field
     self.nonce  = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(4))
     self.n      = 0
     self.debug = debug
+    self.distance_scale = 1.
 
     # callbacks
     self.__on_error    = None
@@ -46,51 +68,18 @@ class Artiemax:
     # get the version once connected
     self.version   = self.__send('version')
 
-  def connectMenu(self, devices):
-    print("Select the Mirobot to connect to:")
-    for i, device in enumerate(devices):
-      print("  %i: %s" % (i+1, device['name']))
-    try:
-      choice = raw_input("Select a number:")
-    except:
-      choice = input("Select a number: ")
-    return choice
+  def inches(self):
+    self.distanceScale = 25.4
+    return self
 
-  def autoConnect(self, id = None, interactive = False):
-    try:
-      res = request.urlopen("http://local.mirobot.io/devices.json").read()
-    except:
-      raise Exception("Could not connect to discovery server")
+  def cm(self):
+    self.distanceScale = 10.
+    return self
 
-    try:
-      devices = json.loads(str(res, 'utf-8'))
-    except TypeError:
-      devices = json.loads(res)
-
-    print(devices)
-    if interactive:
-      choice = self.connectMenu(devices['devices'])
-      print("Connecting to: %s" % devices['devices'][int(choice)-1]['name'])
-      self.connect(devices['devices'][int(choice)-1]['address'])
-    else:
-      if id:
-        filtered = [item for item in devices['devices'] if item['name'] == id]
-        if len(filtered) == 0:
-          raise Exception("No Mirobots found with id: %s" % id)
-        elif len(filtered) == 1:
-          # Connect to the only device we've found
-          self.connect(filtered[0]['address'])
-        else:
-          raise Exception("Multiple Mirobots found with id: %s" % id)
-      else:
-        if len(devices['devices']) == 0:
-          raise Exception("No Mirobots found")
-        elif len(devices['devices']) == 1:
-          # Connect to the only device we've found
-          self.connect(devices['devices'][0]['address'])
-        else:
-          raise Exception("Too many Mirobots found to auto connect without specifying an ID")
-
+  def mm(self):
+    self.distanceScale = 1.
+    return self
+    
   def errorNotify(self, on_error):
     self.__on_error = on_error
 
@@ -108,16 +97,16 @@ class Artiemax:
     return self.__send('ping') or self
 
   def arc(self, distance, wangle):
-    return self.__send('arc', [distance, wangle]) or self
+    return self.__send('arc', [distance*self.distanceScale, wangle]) or self
   
   def uptime(self):
     return self.__send('uptime')
 
   def forward(self, distance):
-    return self.__send('forward', distance) or self
+    return self.__send('forward', distance*self.distanceScale) or self
 
   def back(self, distance):
-    return self.__send('back',    distance) or self
+    return self.__send('back',    distance*self.distanceScale) or self
 
   def left(self, degrees):
     return self.__send('left',    degrees) or self
@@ -162,7 +151,7 @@ class Artiemax:
   def disconnect(self):
     self.__send_q.put(_sentinel)
 
-  def __send(self, cmd, arg = None, timeout = 500000000):
+  def __send(self, cmd, arg = None, timeout = 5000):
     # Assemble the message
     msg = {'cmd': cmd}
     if (arg is not None):
