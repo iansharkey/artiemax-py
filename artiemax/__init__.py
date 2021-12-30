@@ -31,6 +31,12 @@ class Artiemax:
       address = '192.168.4.1'
     self.connect(address)
 
+  def __enter__(self):
+    return self
+
+  def __exit__(self, exc_type, exc_val, exc_tb):
+    self.disconnect()
+    
   def connect(self, address):
     # Set up the socket handling
     self.__send_q = Queue()
@@ -99,39 +105,39 @@ class Artiemax:
     self.__send('followNotify', ('false','true')[enabled])
 
   def ping(self):
-    return self.__send('ping') and self
+    return self.__send('ping') or self
 
   def arc(self, distance, wangle):
     import pdb; pdb.set_trace()
-    return self.__send('arc', [distance, wangle]) and self
+    return self.__send('arc', [distance, wangle]) or self
   
   
   def uptime(self):
     return self.__send('uptime')
 
   def forward(self, distance):
-    return self.__send('forward', distance) and self
+    return self.__send('forward', distance) or self
 
   def back(self, distance):
-    return self.__send('back',    distance) and self
+    return self.__send('back',    distance) or self
 
   def left(self, degrees):
-    return self.__send('left',    degrees) and self
+    return self.__send('left',    degrees) or self
 
   def right(self, degrees):
-    return self.__send('right',   degrees) and self
+    return self.__send('right',   degrees) or self
 
   def penup(self):
-    return self.__send('penup') and self
+    return self.__send('penup') or self
 
   def pendown(self, pen_num):
-    return self.__send('pendown', pen_num) and self
+    return self.__send('pendown', pen_num) or self
 
   def beep(self, sound_num):
-    return self.__send('beep', sound_num) and self
+    return self.__send('beep', sound_num) or self
 
   def setLed(self, led_num, rgb):
-    return self.__send('leds', [led_num, rgb]) and self
+    return self.__send('leds', [led_num, rgb]) or self
 
   def setAllLeds(self, rgb):
     return self.setLed(6, rgb)
@@ -144,7 +150,7 @@ class Artiemax:
   
   def follow(self, enabled):
     enabled = bool(enabled)
-    return self.__send('follow', enabled) and self
+    return self.__send('follow', enabled) or self
   
   def collideState(self):
     return self.__send('collideState')
