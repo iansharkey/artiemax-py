@@ -5,7 +5,6 @@ This is a library to control your Artie Max from the Python programming language
     import artiemax
     
     # Connect to Artie Max, disconnecting automatically once the with statement exits
-    #  
     with artiemax.Artiemax() as artie:
       # Put the pen down
       artie.pendown(1)
@@ -30,6 +29,7 @@ This is a library to control your Artie Max from the Python programming language
 
 
 The API can be used in a chained method style:
+
     with artiemax.Artiemax() as artie:
       # Put the pen down, set the unit to inches, move forward then back
       artie.pendown(1).inches().forward(4).back(4).penup()
