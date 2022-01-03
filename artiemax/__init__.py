@@ -13,7 +13,17 @@ try:
 except ImportError:
   import urllib2 as request
 
+from enum import Enum
+
 _sentinel = object()
+
+class Colour(Enum):
+  BLUE = "BLUE"
+  GREEN = "GREEN"
+  PURPLE = "PURPLE"
+  YELLOW = "YELLOW"
+  WHITE = "WHITE"
+  BLACK = "BLACK"
 
 class Artiemax:
   """
@@ -126,14 +136,18 @@ class Artiemax:
   def setLed(self, led_num, rgb):
     return self.__send('leds', [led_num, rgb]) or self
 
+  def getSettings(self):
+    return self.__send('getSettings')
+
   def setAllLeds(self, rgb):
-    return self.setLed(6, rgb)
+    return self.setLed(6, rgb) or self
 
   def colorState(self):
     return self.__send('colorState') 
   
-  def findColour(self, rgb):
-    return self.__send('findColour', rgb)
+  def findColour(self, colour: Colour):
+    colourName = colour.value
+    return self.__send('findColour', colourName)
   
   def follow(self, enabled):
     enabled = bool(enabled)
