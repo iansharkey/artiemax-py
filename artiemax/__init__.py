@@ -18,6 +18,7 @@ from enum import Enum
 _sentinel = object()
 
 class Colour(Enum):
+  RED = "RED"
   BLUE = "BLUE"
   GREEN = "GREEN"
   PURPLE = "PURPLE"
@@ -52,7 +53,7 @@ class Artiemax:
     self.nonce  = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(4))
     self.n      = 0
     self.debug = debug
-    self.distance_scale = 1.
+    self.distanceScale = 1.
 
     # callbacks
     self.__on_error    = None
@@ -92,11 +93,6 @@ class Artiemax:
     
   def errorNotify(self, on_error):
     self.__on_error = on_error
-
-  def collideNotify(self, on_collide):
-    enabled = bool(on_collide)
-    self.__on_collide = on_collide
-    self.__send('collideNotify', ('false','true')[enabled])
 
   def followNotify(self, on_follow):
     enabled = bool(on_follow)
@@ -200,6 +196,8 @@ class Artiemax:
       try:
         rx_id = incoming.get('id','???')
         if rx_id != msg_id:
+          if self.debug:
+            print(incoming)
           if (rx_id == 'collide'):
             self.__collide(incoming)
             continue
